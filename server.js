@@ -1,4 +1,6 @@
 const express = require('express');
+const path = require('path');
+const ip = require('ip');
 const bodyParser = require('body-parser');
 //跨域cors
 const cors = require('cors');
@@ -8,16 +10,30 @@ const app = express();
 app.use(bodyParser.json());
 app.use(cors())
 
+// 设置静态文件目录，假设 HTML 文件位于 "public" 文件夹下
+app.use(express.static(path.join(__dirname, '/')));
+
 // 用来保存每个用户的内容
 let contentStudentData = {
-    0: {name:'余俊翼',data:''},
-    1:{name:'陆沛林',data:''},
-    2:{name:'黄梓涵',data:''},
-    3:{name:'宋梓悦',data:''}
+    // 0: {name:'余俊翼',data:''},
+    // 1:{name:'陆沛林',data:''},
+    // 2:{name:'黄梓涵',data:''},
+    // 3:{name:'宋梓悦',data:''},
+    // 0:{name:"慎梓睿",data:""},
+    // 1:{name:"罗耀隆",data:""},
+    0: {name:'杜睿谦',data:''},
+    1:{name:'孙铱辰',data:''},
+    2:{name:'陶元钦',data:''},
 };
 
 //保存老师的内容
 let contentTeacherData = {name:'老师',data:''}
+
+// 默认路由，访问根路径时返回 index.html
+app.get('/', (req, res) => {
+    const filePath = path.join(__dirname, '/', 'index.html');
+    res.sendFile(filePath);
+});
 
 //获取学生名单
 app.get('/getStudentData', (req, res) => {
@@ -80,8 +96,9 @@ app.get('/getTeacherData', (req, res) => {
     res.json(contentTeacherData);
 })
 
+let ipAddress = ip.address();
 
 // 启动服务器
-app.listen(3000, () => {
-    console.log('服务器启动在 http://localhost:3000');
+app.listen(80, () => {
+    console.log(`服务器启动在 http://${ipAddress}`);
 });
