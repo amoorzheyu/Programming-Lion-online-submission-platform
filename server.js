@@ -29,25 +29,26 @@ const storage = multer.diskStorage({
 
 // 文件过滤和大小限制
 const fileFilter = (req, file, cb) => {
-    // 允许的文件类型
-    const allowedTypes = [
-        'image/jpeg',
-        'image/png',
-        'image/jpg',
-        'application/pdf',
-        'application/vnd.ms-powerpoint', // PowerPoint文件
-        'application/vnd.openxmlformats-officedocument.presentationml.presentation', // PowerPoint .pptx文件
-        'application/msword', // Word .doc 文件
-        'application/vnd.openxmlformats-officedocument.wordprocessingml.document' ,// Word .docx 文件
-        'application/vnd.ms-excel', // Excel文件
-        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-        'text/html',
-    ];
+    // // 允许的文件类型
+    // const allowedTypes = [
+    //     'image/jpeg',
+    //     'image/png',
+    //     'image/jpg',
+    //     'application/pdf',
+    //     'application/vnd.ms-powerpoint', // PowerPoint文件
+    //     'application/vnd.openxmlformats-officedocument.presentationml.presentation', // PowerPoint .pptx文件
+    //     'application/msword', // Word .doc 文件
+    //     'application/vnd.openxmlformats-officedocument.wordprocessingml.document' ,// Word .docx 文件
+    //     'application/vnd.ms-excel', // Excel文件
+    //     'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    //     'text/html',
+    //     'text/plain'
+    // ];
 
-    // 如果文件类型不符合要求，返回错误
-    if (!allowedTypes.includes(file.mimetype)) {
-        return cb(new Error('Invalid file type'), false); // 不允许的文件类型
-    }
+    // // 如果文件类型不符合要求，返回错误
+    // if (!allowedTypes.includes(file.mimetype)) {
+    //     return cb(new Error('Invalid file type'), false); // 不允许的文件类型
+    // }
 
     // 允许上传
     cb(null, true);
@@ -64,16 +65,16 @@ const upload = multer({
 
 // 用来保存每个用户的内容
 let contentStudentData = {
-    // 0: {name:'余俊翼',data:''},
-    // 1:{name:'陆沛林',data:''},
-    // 2:{name:'黄梓涵',data:''},
-    // 3:{name:'宋梓悦',data:''},
+    0: {name:'余俊翼',data:''},
+    1:{name:'陆沛林',data:''},
+    2:{name:'黄梓涵',data:''},
+    3:{name:'宋梓悦',data:''},
     // 0:{name:"慎梓睿",data:""},
     // 1:{name:"罗耀隆",data:""},
     // 0: {name:'杜睿谦',data:''},
     // 1:{name:'孙铱辰',data:''},
     // 2:{name:'陶元钦',data:''},
-    0: { name: '陆沛林', data: '' },
+    // 0: { name: '陆沛林', data: '' },
 };
 
 //保存老师的内容
@@ -221,7 +222,7 @@ app.get('/downloadTeacherToStudentFile', (req, res) => {
     } else {
         let { filePath ,fileName,fileType}= teacherToStudentFileList[studentName]
         const filePathAll = path.join(__dirname, filePath); // 替换为实际文件路径
-        const newFileName = fileName+fileType; // 设置新的文件名
+        let newFileName = fileName+fileType; // 设置新的文件名 
         res.download(filePathAll, newFileName, (err) => {
             if (err) {
                 res.status(500).send('文件不存在！！！');
