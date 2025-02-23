@@ -21,9 +21,10 @@ let contentStudentData = {
     // 3:{name:'宋梓悦',data:''},
     // 0:{name:"慎梓睿",data:""},
     // 1:{name:"罗耀隆",data:""},
-    0: {name:'杜睿谦',data:''},
-    1:{name:'孙铱辰',data:''},
-    2:{name:'陶元钦',data:''},
+    // 0: {name:'杜睿谦',data:''},
+    // 1:{name:'孙铱辰',data:''},
+    // 2:{name:'陶元钦',data:''},
+    0:{name:'陆沛林',data:''},
 };
 
 //保存老师的内容
@@ -94,6 +95,32 @@ app.get('/getAllStudentData', (req, res) => {
 //获取教师文本
 app.get('/getTeacherData', (req, res) => {
     res.json(contentTeacherData);
+})
+//教师上传的文件列表
+
+let teacherToStudentFileList = []
+
+//初始化教师上传的文件列表
+let initTeacherToStudentFileList = () => {
+    for (let i = 0; i < Object.keys(contentStudentData).length; i++) {
+        teacherToStudentFileList[contentStudentData[i].name] = {
+            updateTime: '', // 更正拼写
+            fileName: '',
+            fileData: '',
+            isDownload: false
+        };
+    }
+}
+
+initTeacherToStudentFileList()
+
+//教师上传文件
+app.post('/uploadTeacherToStudentFile', (req, res) => {
+    // 获取客户端发送的数据
+    const data = req.body;
+    console.log(data)
+    // 将数据保存到全局变量中
+   teacherToStudentFileList[name] = {}
 })
 
 let ipAddress = ip.address();
