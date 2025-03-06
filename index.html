@@ -4432,6 +4432,7 @@
    * @returns {HTMLButtonElement} - 按钮元素
    */
   const createAllClearButton = (text, event) => {
+    //TODO:接口resetAllStudentMsg
   };
 
   /**
@@ -4440,7 +4441,9 @@
    * @param {function} event - 点击事件处理函数
    * @returns {HTMLButtonElement} - 按钮元素
    */
-
+  const createClearButtonByName = (text, event) => {
+    //TODO:接口resetStudentMsg
+  };
   /**
   * 查询学生文本是否需要重置
   */
@@ -4879,7 +4882,7 @@
   /* 上传按钮 */
   .uploadbuttons-io-button {
     position: absolute;
-    top: 1.65em;
+    top: 2.2em;
     right: 0.2em;
     display: flex;
     align-items: center;
@@ -4887,6 +4890,8 @@
     font-weight: 500;
     font-size: 17px;
     padding: 0.5em 1em;
+    min-width: 70px;
+    height: 35px;
     color: white;
     background: #ff7d00;
     background: linear-gradient(0deg,

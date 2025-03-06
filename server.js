@@ -290,6 +290,28 @@ app.get('/studentRefresh', (req, res) => {
     }
 })
 
+//清空所有学生文本并重置状态
+app.get('/resetAllStudentMsg', (req, res) => {
+    Object.keys(contentStudentData).forEach(key => {
+        contentStudentData[key].data="";
+        contentStudentData[key].isReset=true;
+    })
+    res.json({ code: 200, msg:`成功清空所有学生文本并重置状态`});
+})
+
+//清空对应学生文本并重置状态
+app.get('/resetStudentMsg', (req, res) => {
+    let studentName = req.query.name;
+    let studentIndex = getStudentListIndexByName(studentName);
+    if(studentIndex==-1){
+        res.json({ code: 666, msg:`没有找到学生${studentName}`});
+    }else{
+        contentStudentData[studentIndex].data = [];
+        contentStudentData[studentIndex].isReset = true;
+        res.json({ code: 200, msg:`重置学生${studentName}成功`});
+    }
+})
+
 let ipAddress = ip.address();
 
 // 启动服务器
