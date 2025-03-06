@@ -290,7 +290,7 @@ app.get('/studentRefresh', (req, res) => {
     }
 })
 
-//清空所有学生文本并重置状态
+//所有学生文本并重置状态
 app.get('/resetAllStudentMsg', (req, res) => {
     Object.keys(contentStudentData).forEach(key => {
         contentStudentData[key].data="";
