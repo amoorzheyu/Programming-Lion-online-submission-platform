@@ -4171,6 +4171,8 @@
 <script>
   let Local_Area_Network_IP = window.location.hostname;
   let isTeacher = false;
+  let sutdentLists = [];
+  let nameNow = "";
   let configs = {
     // autoClose:false
   };
@@ -4308,13 +4310,17 @@
 
         // 从响应头获取文件名
         const contentDisposition = res.headers['content-disposition'];
-
+        // console.log(contentDisposition);
         // 正则表达式来匹配 URL 编码的文件名
         const regex = /filename\*=UTF-8''(.*)/;
 
         // 使用正则表达式进行匹配
-        const match = contentDisposition.match(regex);
+        let match = contentDisposition.match(regex);
 
+        if (!match) {
+          match = contentDisposition.match(/filename="(.+)"/);
+        }
+        console.log(match);
         if (match) {
           // 获取匹配到的 URL 编码文件名部分
           const encodedFilename = match[1];
@@ -4419,7 +4425,43 @@
     return button;
   };
 
-  let sutdentLists = [];
+  /**
+   * 创建一键清空按钮
+   * @param {string} text - 按钮文本
+   * @param {function} event - 点击事件处理函数
+   * @returns {HTMLButtonElement} - 按钮元素
+   */
+  const createAllClearButton = (text, event) => {
+  };
+
+  /**
+   * 创建单独清空按钮
+   * @param {string} text - 按钮文本
+   * @param {function} event - 点击事件处理函数
+   * @returns {HTMLButtonElement} - 按钮元素
+   */
+
+  /**
+  * 查询学生文本是否需要重置
+  */
+  let isStudentNeedReset = () => {
+    let isLastGet = true;
+    setInterval(() => {
+      if (isLastGet) {
+      
+        axios.get(`${baseUrl}/isResetStudent/?name=${nameNow}`).then((res) => {
+         let textArea = document.querySelector("#student-text")
+         if(res.data.isReset==true&&textArea.value!==res.data.msg){
+          textArea.value=res.data.msg
+         }
+          isLastGet=true
+        })
+        isLastGet=false
+      }
+
+    }, 1000)
+  };
+
   window.onload = function () {
     let url = window.location.href;
 
@@ -4445,6 +4487,10 @@
         isTeacher = false;
       }
     }
+    if (!isTeacher) {
+      isStudentNeedReset()
+    }
+    nameNow = name;
 
     //录入剪切板函数
     let copyfun = (value) => {
@@ -4549,6 +4595,18 @@
       getMessfun();
     }, 1000);
   };
+
+  /**
+   * 页面刷新时执行
+   */
+  window.addEventListener('beforeunload', function (event) {
+    const url = `${baseUrl}/studentRefresh/?name=` + nameNow;
+    if (isTeacher == false) {
+      axios.get(url);
+    }
+  });
+
+
 </script>
 <style>
   .qmsg.qmsg-wrapper {

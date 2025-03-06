@@ -65,16 +65,33 @@ const upload = multer({
 
 // 用来保存每个用户的内容
 let contentStudentData = {
-    0: {name:'余俊翼',data:''},
-    1:{name:'陆沛林',data:''},
-    2:{name:'黄梓涵',data:''},
-    3:{name:'宋梓悦',data:''},
-    // 0:{name:"慎梓睿",data:""},
-    // 1:{name:"罗耀隆",data:""},
-    // 0: {name:'杜睿谦',data:''},
-    // 1:{name:'孙铱辰',data:''},
-    // 2:{name:'陶元钦',data:''},
-    // 0: { name: '陆沛林', data: '' },
+    // 0: {name:'余俊翼',data:'',isReset:true},
+    // 1:{name:'陆沛林',data:'',isReset:true},
+    // 2:{name:'黄梓涵',data:'',isReset:true},
+    // 0:{name:'陆沛林',data:'',isReset:true},
+    // 1:{name:'黄梓涵',data:'',isReset:true},
+    // 0:{name:'杨梓悦',data:'',isReset:true},
+    // 0:{name:"慎梓睿",data:"",isReset:true},
+    // 1:{name:"罗耀隆",data:"",isReset:true},
+    0: {name:'杜睿谦',data:'',isReset:true},
+    1:{name:'孙铱辰',data:'',isReset:true},
+    2:{name:'陶元钦',data:'',isReset:true},
+    // 0: { name: '陆沛林', data: '' ,isReset:true},
+    // 0:{name:'黄熙粤',data:'',isReset:true},
+    // 1:{name:'胡哲涵',data:'',isReset:true},
+    // 0: {name:'徐远涵',data:'',isReset:true},
+    // 1:{name:'杨政',data:'',isReset:true},
+    // 2:{name:'聂可馨',data:'',isReset:true},
+    //  0:{name:'彭雄晖',data:'',isReset:true},
+    // 1:{name:'陈泽昊',data:'',isReset:true},
+    // 0: { name: '郑博阳', data: '' ,isReset:true},
+    // 1: { name: '罗耀隆', data: '' ,isReset:true},
+    // 2: { name: '慎梓睿', data: '' ,isReset:true},
+    // 3: { name: '谢铠烨', data: '' ,isReset:true},
+    // 4: { name: '谢铠磊', data: '' ,isReset:true},
+    // 5: { name: '林俊漩', data: '' ,isReset:true},
+    // 6: { name: '姜希杰', data: '' ,isReset:true},
+    //  0: { name: '陈少宗', data: '' ,isReset:true},
 };
 
 //保存老师的内容
@@ -85,6 +102,7 @@ app.get('/', (req, res) => {
     const filePath = path.join(__dirname, '/', 'index.html');
     res.sendFile(filePath);
 });
+
 
 //获取学生名单
 app.get('/getStudentData', (req, res) => {
@@ -230,6 +248,47 @@ app.get('/downloadTeacherToStudentFile', (req, res) => {
         });
     }
 });
+
+//通过名字查询学生列表下标
+let getStudentListIndexByName = (name) => {
+    for (let i = 0; i < Object.keys(contentStudentData).length; i++) {
+        if (contentStudentData[i].name == name) {
+            return i;
+        }
+    }
+    return -1;
+}
+
+//查询学生文本是否需要重置
+app.get('/isResetStudent', (req, res) => {
+    let studentName = req.query.name;
+    studentName = decodeURIComponent(studentName);
+    let studentIndex=getStudentListIndexByName(studentName)
+    if(studentIndex==-1){
+        res.json({ code: 666, message: '不存在该学员' });
+    }else{
+        let msgdata=contentStudentData[studentIndex].data
+        if(contentStudentData[studentIndex].isReset==true){
+            res.json({ code: 200, isReset:true,msg:`${msgdata}`});
+            contentStudentData[studentIndex].isReset=false;
+        }else{
+         res.json({ code: 200, isReset:false});   
+        }
+    }
+})
+
+//学生刷新界面
+app.get('/studentRefresh', (req, res) => {
+    let studentName = req.query.name;
+    studentName = decodeURIComponent(studentName);
+    let studentIndex=getStudentListIndexByName(studentName)
+    if(studentIndex==-1){
+        res.json({ code: 666, message: '不存在该学员' });
+    }else{
+        contentStudentData[studentIndex].isReset=true;
+        res.json({ code: 200, msg:`成功启动${studentName}重置状态`});
+    }
+})
 
 let ipAddress = ip.address();
 
