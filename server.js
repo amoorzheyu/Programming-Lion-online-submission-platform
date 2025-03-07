@@ -159,7 +159,6 @@ app.post('/uploadStudentData', (req, res) => {
 app.get('/getAllStudentData', (req, res) => {
     res.json(contentStudentData);
 })
-
 //获取教师文本
 app.get('/getTeacherData', (req, res) => {
     res.json(contentTeacherData);
