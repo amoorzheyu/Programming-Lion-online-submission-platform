@@ -3,8 +3,9 @@
 
 <head>
   <meta charset="UTF-8" />
+  <link rel="shortcut icon" href="./favicon.ico" type="image/x-icon"></link>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Document</title>
+  <title>编程狮在线提交平台</title>
   <style>
     /* 方法一：调整字体样式和背景颜色 */
 
@@ -4556,6 +4557,7 @@
   };
 
   window.onload = function () {
+    const TEACHERPASSWORD = "8848" 
     let url = window.location.href;
 
     //获取name参数并转化为中文
@@ -4575,6 +4577,11 @@
     } else {
       name = decodeURI(name);
       if (name.includes("老师")) {
+        let password = prompt("请输入教师密码");
+
+        while(password!=TEACHERPASSWORD){
+          password = prompt("请输入教师密码");
+        }
         isTeacher = true;
       } else {
         isTeacher = false;
