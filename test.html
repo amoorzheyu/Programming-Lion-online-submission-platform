@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <title>学生补课信息登记</title>
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        font-family: "Segoe UI", sans-serif;
+        background-color: #f4f6f8;
+        margin: 0;
+        padding: 0;
+        overflow-y: hidden;
+      }
+
+      html,
+      body {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+      }
+
+      .top-bar {
+        height: 80px;
+        flex-shrink: 0;
+        padding: 20px;
+        background-color: #fff;
+        display: flex;
+        justify-content: flex-start;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+      }
+      .add-button {
+        background-color: #28a745;
+        color: white;
+        border: none;
+        padding: 10px 16px;
+        border-radius: 6px;
+        font-size: 16px;
+        cursor: pointer;
+      }
+      .add-button:hover {
+        background-color: #218838;
+      }
+
+      .modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background-color: rgba(0, 0, 0, 0.4);
+        justify-content: center;
+        align-items: center;
+        z-index: 10;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+      }
+      .modal.show {
+        display: flex;
+        opacity: 1;
+      }
+
+      .modal-content {
+        background-color: #fff;
+        padding: 30px;
+        border-radius: 16px;
+        width: 95%;
+        max-width: 700px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        transform: scale(0.95);
+        transition: transform 0.3s ease;
+      }
+
+      .modal.show .modal-content {
+        transform: scale(1);
+      }
+
+      form label {
+        display: block;
+        margin-top: 15px;
+        font-weight: bold;
+      }
+      .date-label {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      .date-info {
+        font-size: 14px;
+        color: #555;
+      }
+
+      input[type="text"],
+      input[type="date"] {
+        width: 100%;
+        padding: 10px 14px;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        margin-top: 5px;
+        background-color: #fff;
+        background-image: url('data:image/svg+xml;utf8,<svg fill="gray" height="20" viewBox="0 0 24 24" width="20" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/></svg>');
+        background-repeat: no-repeat;
+        background-position: right 10px center;
+        background-size: 18px;
+        appearance: none;
+      }
+
+      .submit-button {
+        margin-top: 25px;
+        padding: 12px 24px;
+        border: none;
+        background-color: #007bff;
+        color: white;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 16px;
+      }
+      .submit-button:hover {
+        background-color: #0056b3;
+      }
+
+      .content {
+        padding: 20px;
+        display: flex;
+        justify-content: center;
+      }
+      .entry-list {
+        max-height: calc(80%);
+        overflow-y: auto;
+        width: 100%;
+        max-width: 600px;
+      }
+
+      .entry {
+        background-color: #fff;
+        border-left: 4px solid #007bff;
+        padding: 15px 20px;
+        border-radius: 10px;
+        margin-bottom: 15px;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+        position: relative;
+      }
+
+      .entry_complete {
+        border-left: 4px solid #ccc;
+      }
+      .entry .header-text {
+        font-size: 18px;
+        font-weight: bold;
+        color: #333;
+        margin-bottom: 8px;
+      }
+
+      .header-text {
+        position: sticky;
+        top: 0;
+        z-index: 10; /* 必须够高，确保盖在内容上 */
+        padding: 12px 10px;
+        border-bottom: 1px solid #eee;
+        font-size: 18px;
+        font-weight: bold;
+        color: #333;
+        cursor: pointer;
+      }
+
+      .entry .details {
+        font-size: 14px;
+        border-top: 1px solid #ddd;
+        padding-top: 8px;
+        margin-top: 6px;
+        color: #333;
+      }
+
+      .completed {
+        background-color: #f0f0f0;
+        color: #777;
+        border-left-color: #999;
+      }
+      .collapsed .details {
+        display: none;
+      }
+      .toggle {
+        cursor: pointer;
+        color: #007bff;
+        text-decoration: underline;
+        font-size: 14px;
+        margin-top: 10px;
+      }
+
+      #completed-entries.collapsed {
+        display: none;
+      }
+
+      input[type="date"] {
+        width: 100%;
+        padding: 14px 18px;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        margin-top: 5px;
+        background-color: #fff;
+        background-image: url('data:image/svg+xml;utf8,<svg fill="gray" height="30" viewBox="0 0 24 24" width="30" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/></svg>');
+        background-repeat: no-repeat;
+        background-position: right 12px center;
+        background-size: 30px;
+        appearance: none;
+        font-size: 20px; /* ⬅️ 放大字体 */
+        height: 55px; /* ⬅️ 放大输入框高度 */
+        line-height: 1.5;
+        zoom: 1.2; /* ⬅️ 有些浏览器会同步放大弹出日历 */
+      }
+      #incomplete-entries,
+      #completed-entries {
+        transition: all 0.3s ease;
+        max-height: calc(80%);
+      }
+      .content.row {
+        flex: 1;
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        align-items: flex-start;
+        padding: 20px;
+        gap: 20px;
+        height: 100%; /* 👈 关键点：自动占满剩余空间 */
+      }
+
+      .entry-list-wrapper {
+        flex: 1;
+        max-width: 600px;
+        display: flex;
+        flex-direction: column;
+        height: 100%; /* ✅ 保证能占满容器高度 */
+      }
+
+      .entry-list {
+        flex: 1; /* ✅ 自动撑满剩下空间 */
+        overflow-y: auto;
+        padding-right: 6px;
+      }
+
+      /* 美化滚动条 */
+      .entry-list::-webkit-scrollbar {
+        width: 8px;
+      }
+      .entry-list::-webkit-scrollbar-track {
+        background: #f0f0f0;
+        border-radius: 4px;
+      }
+      .entry-list::-webkit-scrollbar-thumb {
+        background: #ccc;
+        border-radius: 4px;
+      }
+      .entry-list::-webkit-scrollbar-thumb:hover {
+        background: #999;
+      }
+
+      .entry + .entry {
+        margin-top: 15px;
+      }
+
+      .sticky-header {
+        position: sticky;
+        top: 0;
+        background-color: #fff;
+        z-index: 10;
+        padding: 12px 16px;
+        border-bottom: 1px solid #ddd;
+        font-size: 18px;
+        font-weight: bold;
+        color: #333;
+        margin-bottom: 10px;
+        cursor: pointer;
+      }
+
+      #incomplete-entries.collapsed {
+        display: none;
+      }
+      .completed {
+        background-color: #f0f0f0;
+        border-left-color: #999;
+      }
+
+      .completed,
+      .completed * {
+        color: #777 !important;
+      }
+
+      /* 美化“标记为已完成”区域 */
+      .details label {
+        display: flex;
+        align-items: center;
+        font-size: 16px;
+        margin-top: 10px;
+        gap: 10px;
+        cursor: pointer;
+      }
+
+      /* 放大复选框 */
+      .details input[type="checkbox"].complete-checkbox {
+        width: 20px;
+        height: 20px;
+        cursor: pointer;
+        accent-color: #28a745; /* ✔️绿色风格复选框 */
+      }
+
+      /* 可选：让勾选状态更显眼 */
+      .details input[type="checkbox"]:checked + span {
+        color: #28a745;
+        font-weight: bold;
+      }
+
+      .delete-button {
+        position: absolute;
+        top: 8px;
+        right: -10px;
+        background-color: transparent;
+        border: none;
+        color: #dc3545;
+        font-size: 25px;
+        cursor: pointer;
+      }
+
+      .delete-button:hover {
+        color: #a71d2a;
+      }
+
+      .autocomplete-items {
+        position: absolute;
+        border: 1px solid #ccc;
+        border-top: none;
+        z-index: 99;
+        background-color: white;
+        max-height: 200px;
+        overflow-y: auto;
+        width: 80%;
+        border-radius: 0 0 6px 6px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      }
+
+      .autocomplete-items div {
+        padding: 10px;
+        cursor: pointer;
+      }
+
+      .autocomplete-items div:hover,
+      .autocomplete-active {
+        background-color: rgb(0, 166, 237);
+        color: white;
+      }
+      .app-title {
+        font-size: 22px;
+        font-weight: bold;
+        color: #333;
+        margin-right: 30px;
+        align-self: center;
+      }
+
+      #incomplete-entries header-tex{
+        background-color: white;
+      }
+
+      #completed-entries header-tex{
+        background-color: #F0F0F0;
+      }
+
+
+    </style>
+  </head>
+  <body>
+    <div class="top-bar">
+      <div class="app-title">🦁 编程狮补课登记系统</div>
+      <button class="add-button" onclick="openModal()">➕ 添加补课记录</button>
+    </div>
+    
+
+    <div class="content row">
+      <!-- 未完成记录 -->
+      <div class="entry-list-wrapper">
+        <div class="header-text sticky-header" onclick="toggleIncompleteList()">
+          ⬇️ 未完成记录（点击展开/收起）
+        </div>
+        <div class="entry-list">
+          <div id="incomplete-entries" class=""></div>
+        </div>
+      </div>
+
+      <!-- 已完成记录 -->
+      <div class="entry-list-wrapper">
+        <div class="header-text sticky-header" onclick="toggleCompletedList()">
+          ⬇️ 已完成记录（点击展开/收起）
+        </div>
+        <div class="entry-list">
+          <div id="completed-entries" class=""></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal" id="modal">
+      <div class="modal-content">
+        <form id="tutoring-form">
+          <label class="date-label">
+            请假日期（默认今天）:
+            <span class="date-info" id="leave-info"></span>
+          </label>
+          <input type="date" id="leave-date" />
+
+          <label
+            >学生姓名:
+            <input type="text" id="student-name" required />
+            <div id="autocomplete-list" class="autocomplete-items"></div>
+          </label>
+
+          <label class="date-label">
+            补课日期（默认明天）:
+            <span class="date-info" id="makeup-info"></span>
+          </label>
+          <input type="date" id="makeup-date" required />
+
+          <button type="submit" class="submit-button">💾 保存补课记录</button>
+        </form>
+      </div>
+    </div>
+
+    <script>
+      const STORAGE_KEY = "makeupRecords";
+
+      const leaveInput = document.getElementById("leave-date");
+      const makeupInput = document.getElementById("makeup-date");
+      const leaveInfo = document.getElementById("leave-info");
+      const makeupInfo = document.getElementById("makeup-info");
+      const form = document.getElementById("tutoring-form");
+      const modal = document.getElementById("modal");
+      const entriesDiv = document.getElementById("entries");
+      const incompleteContainer = document.getElementById("incomplete-entries");
+      const completedContainer = document.getElementById("completed-entries");
+
+      const studentList = [
+        "余俊翼",
+        "陆沛林",
+        "黄梓涵",
+        "苏俞华",
+        "彭雄晖",
+        "杨梓悦",
+        "慎梓睿",
+        "罗耀隆",
+        "杜睿谦",
+        "孙铱辰",
+        "陶元钦",
+        "黄熙粤",
+        "胡哲涵",
+        "徐远涵",
+        "杨政",
+        "聂可馨",
+        "陈泽昊",
+        "陈少宗",
+        "林冠廷",
+        "宋浩扬",
+        "姜希杰",
+        "谢铠烨",
+        "谢铠磊",
+        "林俊漩",
+        "郑博阳",
+        "邓景珑",
+      ];
+
+      function openModal() {
+        const modal = document.getElementById("modal");
+        modal.classList.add("show");
+      }
+
+      function closeModal() {
+        const modal = document.getElementById("modal");
+        modal.classList.remove("show");
+      }
+
+      function toggleIncompleteList() {
+        incompleteContainer.classList.toggle("collapsed");
+      }
+
+      function toggleCompletedList() {
+        completedContainer.classList.toggle("collapsed");
+      }
+
+      function getWeekCategory(dateStr) {
+        const parseLocalDate = (str) => {
+          const [year, month, day] = str.split("-").map(Number);
+          return new Date(year, month - 1, day); // 避免时区偏差
+        };
+
+        const inputDate = parseLocalDate(dateStr);
+        inputDate.setHours(0, 0, 0, 0);
+
+        const now = new Date();
+        now.setHours(0, 0, 0, 0);
+
+        const currentDay = now.getDay();
+        const mondayOffset = currentDay === 0 ? -6 : 1 - currentDay;
+        const baseMonday = new Date(now);
+        baseMonday.setDate(now.getDate() + mondayOffset);
+        baseMonday.setHours(0, 0, 0, 0);
+
+        const ONE_WEEK = 7 * 24 * 60 * 60 * 1000;
+        const baseTime = baseMonday.getTime();
+        const labels = [
+          "更久以前",
+          "上五周",
+          "上四周",
+          "上三周",
+          "上两周",
+          "上周",
+          "本周",
+          "下周",
+          "下两周",
+          "下三周",
+          "下四周",
+          "下五周",
+          "更久以后",
+        ];
+        const weeks = Array.from(
+          { length: labels.length }, // ⬅️ 改这里
+          (_, i) => new Date(baseTime + (i - 5) * ONE_WEEK)
+        );
+
+        for (let i = 0; i < 12; i++) {
+          if (inputDate >= weeks[i] && inputDate < weeks[i + 1]) {
+            return labels[i + 1];
+          }
+        }
+
+        if (inputDate < weeks[0]) return labels[0];
+        if (inputDate >= weeks[12]) return labels[12];
+      }
+
+      function formatDateWithWeekday(dateStr, more) {
+        const date = new Date(dateStr);
+        const weekdays = [
+          "星期日",
+          "星期一",
+          "星期二",
+          "星期三",
+          "星期四",
+          "星期五",
+          "星期六",
+        ];
+        if (more) {
+          return `${date.getMonth() + 1}月${date.getDate()}日 ${
+            weekdays[date.getDay()]
+          }`;
+        } else {
+          return `${date.getMonth() + 1}月${date.getDate()}日`;
+        }
+      }
+
+      function updateDateInfo(inputEl, infoEl, more = true) {
+        const val = inputEl.value;
+        if (!val) return (infoEl.textContent = "");
+        infoEl.textContent = `${formatDateWithWeekday(
+          val,
+          more
+        )}（${getWeekCategory(val)}）`;
+      }
+
+      function saveToStorage(data) {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+      }
+
+      function loadFromStorage() {
+        const data = localStorage.getItem(STORAGE_KEY);
+        return data ? JSON.parse(data) : [];
+      }
+
+      function renderEntries() {
+        completedContainer.innerHTML = "";
+        incompleteContainer.innerHTML = "";
+
+        loadFromStorage().forEach((record, index) => {
+          const entry = document.createElement("div");
+          entry.className = "entry collapsed ";
+          if (record.completed) entry.classList.add("completed");
+
+          entry.innerHTML = `
+ <div class="header-text">
+  ${record.studentName} - 补课：${formatDateWithWeekday(
+            record.makeupDate,
+            true
+          )} ${getWeekCategory(record.makeupDate)}
+  <button class="delete-button" title="删除此条记录">🗑</button>
+</div>
+
+<div class="details details-hidden">
+  请假日期：${formatDateWithWeekday(record.leaveDate, true)} ${getWeekCategory(
+            record.leaveDate
+          )}<br />
+  <label>
+    <input type="checkbox" class="complete-checkbox" ${
+      record.completed ? "checked" : ""
+    }/>
+    <span>标记为已完成</span>
+  </label>
+</div>
+
+  <div class="toggle">[展开/折叠]</div>
+    `;
+
+          // 切换折叠/展开
+          entry.querySelector(".toggle").onclick = () =>
+            entry.classList.toggle("collapsed");
+
+          // 复选框操作
+          entry.querySelector(".complete-checkbox").onchange = (e) => {
+            record.completed = e.target.checked;
+            const all = loadFromStorage();
+            all[index] = record;
+            saveToStorage(all);
+            renderEntries();
+          };
+
+          // 删除按钮事件
+          entry.querySelector(".delete-button").onclick = () => {
+            if (confirm("确定要删除这条记录吗？")) {
+              const all = loadFromStorage();
+              all.splice(index, 1); // 删除当前记录
+              saveToStorage(all);
+              renderEntries();
+            }
+          };
+
+          (record.completed
+            ? completedContainer
+            : incompleteContainer
+          ).appendChild(entry);
+        });
+      }
+
+      form.onsubmit = (e) => {
+        e.preventDefault();
+        const leaveDate = leaveInput.value;
+        const studentName = document
+          .getElementById("student-name")
+          .value.trim();
+        const makeupDate = makeupInput.value;
+        if (!leaveDate || !studentName || !makeupDate)
+          return alert("请填写完整信息！");
+        const newRecord = {
+          leaveDate,
+          studentName,
+          makeupDate,
+          completed: false,
+        };
+        const records = loadFromStorage();
+        records.push(newRecord);
+        saveToStorage(records);
+        renderEntries();
+        form.reset();
+        setDefaultDates();
+        closeModal();
+      };
+
+      modal.onclick = (e) => {
+        if (e.target === modal) closeModal();
+      };
+
+      function setDefaultDates() {
+        const today = new Date();
+        const tomorrow = new Date(today);
+        tomorrow.setDate(today.getDate() + 1);
+        leaveInput.valueAsDate = today;
+        makeupInput.valueAsDate = tomorrow;
+        updateDateInfo(leaveInput, leaveInfo);
+        updateDateInfo(makeupInput, makeupInfo);
+      }
+
+      document.addEventListener("click", function (e) {
+        const isInput = e.target === studentInput;
+        const isItem = autoDiv.contains(e.target);
+        if (!isInput && !isItem) {
+          autoDiv.innerHTML = "";
+        }
+      });
+
+      const studentInput = document.getElementById("student-name");
+      const autoDiv = document.getElementById("autocomplete-list");
+
+      let currentFocus = -1;
+
+      studentInput.addEventListener("input", function () {
+        const val = this.value.trim().toLowerCase();
+        autoDiv.innerHTML = "";
+        currentFocus = -1;
+        if (!val) return;
+
+        const matched = studentList.filter((name) =>
+          name.toLowerCase().includes(val)
+        );
+
+        matched.forEach((name) => {
+          const item = document.createElement("div");
+          item.textContent = name;
+          item.onclick = () => {
+            studentInput.value = name;
+            autoDiv.innerHTML = "";
+          };
+          autoDiv.appendChild(item);
+        });
+      });
+
+      studentInput.addEventListener("keydown", function (e) {
+        const items = autoDiv.querySelectorAll("div");
+        if (!items.length) return;
+
+        if (e.key === "ArrowDown") {
+          currentFocus++;
+          setActive(items);
+        } else if (e.key === "ArrowUp") {
+          currentFocus--;
+          setActive(items);
+        } else if (e.key === "Enter") {
+          e.preventDefault();
+          if (currentFocus > -1 && items[currentFocus]) {
+            items[currentFocus].click();
+          }
+        }
+      });
+      function setActive(items) {
+        if (!items.length) return;
+
+        // 修正边界
+        if (currentFocus >= items.length) currentFocus = 0;
+        if (currentFocus < 0) currentFocus = items.length - 1;
+
+        items.forEach((item, i) => {
+          item.classList.toggle("autocomplete-active", i === currentFocus);
+        });
+
+        // 自动滚动当前项到可见区域
+        items[currentFocus]?.scrollIntoView({ block: "nearest" });
+      }
+
+      leaveInput.onchange = () => updateDateInfo(leaveInput, leaveInfo);
+      makeupInput.onchange = () => updateDateInfo(makeupInput, makeupInfo);
+
+      setDefaultDates();
+      renderEntries();
+
+      let lastRenderedDate = new Date().toDateString();
+
+      setInterval(() => {
+        const nowDateStr = new Date().toDateString();
+        if (nowDateStr !== lastRenderedDate) {
+          lastRenderedDate = nowDateStr;
+          setDefaultDates(); // 重新设定默认日期
+        }
+        renderEntries();
+      }, 60 * 60 * 1000);
+    </script>
+  </body>
+</html>
