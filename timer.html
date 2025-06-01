@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>编程狮计时器</title>
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500&display=swap"
+    />
+    <style>
+      html {
+        font-size: calc(100vw / 36);
+      }
+
+      body {
+        margin: 0;
+        padding: 0;
+        background: linear-gradient(to bottom right, #2b2b2b, #494949);
+        font-family: "Montserrat", sans-serif;
+        min-height: 100vh;
+        overflow: hidden;
+      }
+
+      .outer {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        padding: 1rem;
+        box-sizing: border-box;
+      }
+
+      .container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        zoom: 0.6;
+      }
+
+      @media (max-width: 768px) {
+        .container {
+          zoom: 0.5;
+        }
+      }
+
+      @media (max-width: 480px) {
+        .container {
+          zoom: 0.4;
+        }
+      }
+
+      .antenna {
+        width: 5em;
+        height: 5em;
+        border-radius: 50%;
+        border: 2px solid black;
+        background-color: #f27405;
+        margin-bottom: -2em;
+        position: relative;
+        z-index: 1;
+      }
+
+      .a1 {
+        position: absolute;
+        top: -3em;
+        left: -5.2em; /* 原为 -4em，左移对齐 */
+        width: 12em;
+        height: 5.5em;
+        border-radius: 50px;
+        background-image: linear-gradient(#171717, #353535, #171717);
+        transform: rotate(-29deg);
+        clip-path: polygon(50% 0%, 49% 100%, 52% 100%);
+      }
+
+      .a2 {
+        position: absolute;
+        top: -2em;
+        left: 0em; /* 关键修改点：向左调整对齐圆形右侧 */
+        width: 12em;
+        height: 4em;
+        border-radius: 50px;
+        background-image: linear-gradient(#171717, #353535, #171717);
+        clip-path: polygon(
+          47% 0,
+          34% 34%,
+          54% 25%,
+          32% 100%,
+          29% 96%,
+          49% 32%,
+          30% 38%
+        );
+        transform: rotate(-8deg);
+      }
+
+      .tv {
+        width: 32rem;
+        background-color: #d36604;
+        border-radius: 1rem;
+        box-shadow: inset 0.2rem 0.2rem #e69635, 0 1rem 3rem rgba(0, 0, 0, 0.4);
+        border: 0.2rem solid #1d0e01;
+        padding: 1.5rem;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        box-sizing: border-box;
+      }
+
+      .screen {
+        background-color: #000;
+        border: 0.2rem solid #111;
+        border-radius: 0.5rem;
+        width: 100%;
+        height: 6rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #39ff14;
+        font-size: 2.4rem;
+        font-weight: bold;
+        text-shadow: 0 0 0.3rem #39ff14;
+        margin-bottom: 1rem;
+      }
+
+      .title {
+        color: #fff;
+        font-size: 1.4rem;
+        text-align: center;
+        margin-bottom: 1rem;
+      }
+
+      .input-row {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 0.5rem;
+        margin-bottom: 1rem;
+        width: 100%;
+      }
+
+      input[type="text"],
+      input[type="number"] {
+        font-family: inherit;
+        font-size: 1rem;
+        padding: 0.5rem;
+        border: none;
+        border-radius: 0.5rem;
+        flex: 1;
+        min-width: 6rem;
+        box-sizing: border-box;
+      }
+
+      .controls {
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 1rem;
+        width: 100%;
+      }
+
+      button {
+        font-family: inherit;
+        font-size: 1rem;
+        padding: 0.5rem 1rem;
+        background-color: #444;
+        color: white;
+        border: none;
+        border-radius: 0.5rem;
+        cursor: pointer;
+        flex: 1;
+        min-width: 6rem;
+        box-sizing: border-box;
+      }
+
+      button:hover {
+        background-color: #666;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="outer">
+      <div class="container">
+        <div class="antenna">
+          <div class="a1"></div>
+          <div class="a2"></div>
+        </div>
+        <div class="tv">
+          <div class="title" id="timer-title">计时器</div>
+          <div class="screen" id="time">00:00</div>
+          <div class="input-row">
+            <input type="text" id="title-input" placeholder="标题（可选）" />
+            <input type="number" id="minutes" placeholder="分钟" min="0" />
+            <input
+              type="number"
+              id="seconds"
+              placeholder="秒"
+              min="0"
+              max="59"
+            />
+          </div>
+          <div class="controls">
+            <button onclick="startTimer()">开始</button>
+            <button onclick="pauseTimer()">暂停</button>
+            <button onclick="resetTimer()">重置</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      let timer;
+      let remainingSeconds = 0;
+      let isRunning = false;
+
+      function updateDisplay() {
+        const mins = String(Math.floor(remainingSeconds / 60)).padStart(2, "0");
+        const secs = String(remainingSeconds % 60).padStart(2, "0");
+        document.getElementById("time").textContent = `${mins}:${secs}`;
+      }
+
+      function startTimer() {
+        if (!isRunning) {
+          const title = document.getElementById("title-input").value;
+          if (title) {
+            document.getElementById("timer-title").textContent = title;
+          }
+
+          const minutes =
+            parseInt(document.getElementById("minutes").value) || 0;
+          const seconds =
+            parseInt(document.getElementById("seconds").value) || 0;
+
+          if (remainingSeconds === 0) {
+            remainingSeconds = minutes * 60 + seconds;
+          }
+
+          if (remainingSeconds <= 0) return;
+
+          isRunning = true;
+          timer = setInterval(() => {
+            if (remainingSeconds > 0) {
+              remainingSeconds--;
+              updateDisplay();
+            } else {
+              clearInterval(timer);
+              isRunning = false;
+              alert("计时结束！");
+            }
+          }, 1000);
+        }
+      }
+
+      function pauseTimer() {
+        clearInterval(timer);
+        isRunning = false;
+      }
+
+      function resetTimer() {
+        clearInterval(timer);
+        isRunning = false;
+        remainingSeconds = 0;
+        updateDisplay();
+        document.getElementById("timer-title").textContent = "计时器";
+      }
+
+      updateDisplay();
+    </script>
+  </body>
+</html>

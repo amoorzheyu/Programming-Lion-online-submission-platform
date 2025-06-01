@@ -20,6 +20,7 @@ let contentStudentData = {
 
   // 0: { name: "徐远涵", data: "", isReset: true },
   // 1: { name: "杨政", data: "", isReset: true },
+  // 2: {name:'杜睿谦',data:'',isReset:true},
   // 2:{name:'聂可馨',data:'',isReset:true},
 
   // 0: {name:'徐远涵',data:'',isReset:true},
@@ -50,7 +51,6 @@ let contentStudentData = {
   // 1: { name: "黄熙粤", data: "", isReset: true },
   // 2: { name: '姜希杰', data: '' ,isReset:true},
 
-
   // -----------周一-----------下午正常名单----------------------------
   // 0: {name:'杜睿谦',data:'',isReset:true},
   // 1:{name:'孙铱辰',data:'',isReset:true},
@@ -68,8 +68,8 @@ let contentStudentData = {
   // 1:{name:'杨梓悦',data:'',isReset:true},
 
   // ----------周日-----------上午第一节正常名单----------------------------
-  0: { name: "罗耀隆", data: "", isReset: true },
-  1: { name: "林俊漩", data: "", isReset: true },
+  // 0: { name: "罗耀隆", data: "", isReset: true },
+  // 1: { name: "林俊漩", data: "", isReset: true },
   // 2: { name: "慎梓睿", data: "", isReset: true },
   // 3: { name: "谢铠烨", data: "", isReset: true },
   // 4: { name: "谢铠磊", data: "", isReset: true },
@@ -81,7 +81,21 @@ let contentStudentData = {
   // ----------周日-----------下午第1、2节正常名单----------------------------
   // 0: { name: "彭雄晖", data: "", isReset: true },
   // 1: { name: "陆沛林", data: "", isReset: true },
-}
+
+  // ----------周日-----------晚上正常名单----------------------------
+   0: { name: "徐远涵", data: "", isReset: true },
+  1: { name: "杨政", data: "", isReset: true },
+  2: {name:'杜睿谦',data:'',isReset:true},
+
+  //  ----------临时-----------晚上正常名单----------------------------
+//   0: { name: "陶元钦", data: "", isReset: true },
+//   1: { name: "黄熙粤", data: "", isReset: true },
+//   2: { name: "胡哲涵", data: "", isReset: true },
+//   3: { name: "卜锦峰", data: "", isReset: true },
+//   4: { name: "慎梓睿", data: "", isReset: true },
+//   5: { name: "谢铠烨", data: "", isReset: true },
+//   6: { name: "谢铠磊", data: "", isReset: true },
+};
 
 let getContentStudentData = () => {
   return contentStudentData;
