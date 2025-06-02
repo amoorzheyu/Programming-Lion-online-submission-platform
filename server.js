@@ -106,6 +106,16 @@ app.get("/timer", (req, res) => {
   res.sendFile(filePath);
 });
 
+app.get("/cats", (req, res) => {
+  const filePath = path.join(__dirname, "/", "cats.html");
+  res.sendFile(filePath);
+});
+
+app.get("/lyy", (req, res) => {
+  const filePath = path.join(__dirname, "/", "lyy.html");
+  res.sendFile(filePath);
+});
+
 //获取学生名单
 app.get("/getStudentData", (req, res) => {
   //将学生名单放在一个数组中

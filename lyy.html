@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <title>懒洋洋演唱会</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 1em;
+      background: #0f0f0f;
+      color: white;
+      font-family: 'Segoe UI', sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background-image: url(http://img.netbian.com/file/2023/0911/232246ZC7kn.jpg);
+      background-size: cover;
+      background-position: center;
+       background-repeat: no-repeat;
+    }
+
+    /* 🔥 演唱会标题样式 */
+    .title-glow {
+      font-size: 3em;
+      text-align: center;
+      margin-bottom: 0.8em;
+      background: linear-gradient(45deg, #ff00cc, #3333ff, #00ffff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-shadow: 0 0 10px #ff00cc, 0 0 20px #00ffff;
+      animation: flicker 3s infinite alternate;
+    }
+
+    @keyframes flicker {
+      0%   { text-shadow: 0 0 10px #ff00cc, 0 0 20px #00ffff; }
+      50%  { text-shadow: 0 0 20px #ff66cc, 0 0 30px #66ffff; }
+      100% { text-shadow: 0 0 10px #ff00cc, 0 0 25px #00ffff; }
+    }
+
+    video {
+      /* width: vw; */
+      max-height: 60vh;
+      border-radius: 1em;
+      box-shadow: 0 0 20px #222;
+      margin-bottom: 1em;
+    }
+
+    h2 {
+      margin-top: 0.3em;
+      font-size: 1.1em;
+    }
+
+    .btn-group {
+      margin: 1em 0;
+      display: flex;
+      gap: 1em;
+    }
+
+    /* ✨ 按钮样式：Uiverse */
+    button {
+      --glow-color: rgb(217, 176, 255);
+      --glow-spread-color: rgba(191, 123, 255, 0.781);
+      --btn-color: rgb(100, 61, 136);
+      border: .25em solid var(--glow-color);
+      padding: 1em 2em;
+      color: var(--glow-color);
+      font-size: 15px;
+      font-weight: bold;
+      background-color: var(--btn-color);
+      border-radius: 1em;
+      outline: none;
+      box-shadow: 0 0 1em .25em var(--glow-color),
+                  0 0 4em 1em var(--glow-spread-color),
+                  inset 0 0 .75em .25em var(--glow-color);
+      text-shadow: 0 0 .5em var(--glow-color);
+      position: relative;
+      transition: all 0.3s;
+      cursor: pointer;
+    }
+
+    button:hover {
+      color: var(--btn-color);
+      background-color: var(--glow-color);
+    }
+
+    button:active {
+      box-shadow: 0 0 0.6em .25em var(--glow-color),
+                  0 0 2.5em 2em var(--glow-spread-color),
+                  inset 0 0 .5em .25em var(--glow-color);
+    }
+
+    /* ✅ Neon 风格复选框 */
+    .checkbox-wrapper {
+      --checkbox-size: 25px;
+      --checkbox-color: #00ff88;
+      --checkbox-shadow: rgba(0, 255, 136, 0.3);
+      --checkbox-border: rgba(0, 255, 136, 0.7);
+      display: flex;
+      align-items: center;
+      margin-top: 0.5em;
+      margin-left: auto;
+      margin-right: 2vw;
+    }
+
+    .checkbox-wrapper input {
+      position: absolute;
+      opacity: 0;
+      cursor: pointer;
+    }
+
+    .checkbox-wrapper .checkmark {
+      position: relative;
+      width: var(--checkbox-size);
+      height: var(--checkbox-size);
+      border: 2px solid var(--checkbox-border);
+      border-radius: 8px;
+      background: rgba(0, 0, 0, 0.2);
+      box-shadow: 0 0 15px var(--checkbox-shadow);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+      transition: all 0.4s ease;
+    }
+
+    .checkbox-wrapper .checkmark::before {
+      content: "";
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(45deg, var(--checkbox-color), #00ffcc);
+      opacity: 0;
+      transform: scale(0) rotate(-45deg);
+      transition: all 0.4s ease;
+    }
+
+    .checkbox-wrapper input:checked ~ .checkmark::before {
+      opacity: 1;
+      transform: scale(1) rotate(0);
+    }
+
+    .checkbox-wrapper .checkmark svg {
+      width: 0;
+      height: 0;
+      color: #1a1a1a;
+      z-index: 1;
+      transition: all 0.4s ease;
+      filter: drop-shadow(0 0 2px rgba(0, 0, 0, 0.5));
+    }
+
+    .checkbox-wrapper input:checked ~ .checkmark svg {
+      width: 18px;
+      height: 18px;
+      transform: rotate(360deg);
+    }
+
+    .checkbox-wrapper .label {
+      margin-left: 15px;
+      font-size: 18px;
+      color: var(--checkbox-color);
+      text-shadow: 0 0 10px var(--checkbox-shadow);
+    }
+  </style>
+</head>
+<body>
+
+  <h1 class="title-glow">懒洋洋演唱会</h1>
+
+  <video id="video" controls></video>
+  <h2 id="title">加载中...</h2>
+
+  <div class="btn-group">
+    <button onclick="prevVideo()">上一个</button>
+    <button onclick="nextVideo()">下一个</button>
+  </div>
+
+  <label class="checkbox-wrapper">
+    <input type="checkbox" id="autoPlayCheckbox">
+    <div class="checkmark">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+        <path d="M20 6L9 17L4 12" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"></path>
+      </svg>
+    </div>
+    <span class="label">自动播放下一个</span>
+  </label>
+
+  <script>
+    let videos = [];
+    let played = [];
+    let history = [];
+    let index = -1;
+
+    async function loadVideos() {
+      const res = await fetch("lyy_redirects.json");
+      videos = await res.json();
+      nextVideo();
+    }
+
+    function playVideo(videoData) {
+      const video = document.getElementById("video");
+      video.src = videoData.url;
+      document.getElementById("title").innerText = `${videoData.song} - ${videoData.cover}`;
+      video.play();
+    }
+
+    function nextVideo() {
+      let next;
+      do {
+        next = Math.floor(Math.random() * videos.length);
+      } while (played.includes(next) && played.length < videos.length);
+
+      if (played.length >= videos.length) played = [];
+
+      played.push(next);
+      history.push(next);
+      index = history.length - 1;
+      playVideo(videos[next]);
+    }
+
+    function prevVideo() {
+      if (index > 0) {
+        index--;
+        playVideo(videos[history[index]]);
+      }
+    }
+
+    document.getElementById("video").addEventListener("ended", () => {
+      const autoPlay = document.getElementById("autoPlayCheckbox").checked;
+      if (autoPlay) nextVideo();
+    });
+
+    loadVideos();
+  </script>
+
+</body>
+</html>
