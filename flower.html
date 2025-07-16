@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>小红花管理</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f7f7f7;
+            margin: 0;
+            padding: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            font-size: 36px;
+            margin-bottom: 40px;
+        }
+
+        #children-list {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .child-container {
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            width: 320px;
+            display: flex;
+            align-items: center;
+            transition: transform 0.3s;
+            flex-wrap: wrap;
+        }
+
+        .child-container:hover {
+            transform: translateY(-5px);
+        }
+
+        .name-and-buttons {
+            display: flex;
+            align-items: center;
+            flex-grow: 1;
+            flex-basis: 0;
+        }
+
+        .child-name {
+            font-size: 18px;
+            font-weight: bold;
+            color: #4A4A4A;
+            margin-left: 10px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        button:active {
+            background-color: #3e8e41;
+        }
+
+        .flower-count {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            max-width: 100%;
+        }
+
+        .flower-icon {
+            width: 22px;
+            height: 22px;
+            margin-left: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h1>小红花管理</h1>
+
+    <div id="children-list"></div>
+
+    <script>
+        // 孩子的名字列表
+        // const children = ['熙粤',"锦锋"];
+        const children = ['铠磊',"铠烨","希杰","景珑","耀隆","俊漩"];
+        // const children = ["希杰","景珑","耀隆","俊漩"];
+
+        // 孩子小红花的初始数量
+        let flowers = {};
+        children.forEach((child, index) => {
+            flowers[child] = 0;
+        });
+
+        // 函数更新显示的小红花数量
+        function updateFlowers(childName) {
+            const flowerCountElement = document.getElementById(`flower-count-${childName}`);
+            flowerCountElement.innerHTML = ''; // 清空之前的小红花
+
+            // 重新按数量添加小红花
+            for (let i = 0; i < flowers[childName]; i++) {
+                const flower = document.createElement('span');
+                flower.className = 'flower-icon';
+                flower.innerHTML = `<svg t="1752043804775" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="5050" width="22" height="22"><path d="M524.8 832l-96 64c-70.4 44.8-166.4 32-217.6-38.4-25.6-38.4-38.4-83.2-19.2-128l32-102.4-89.6-64c-64-51.2-83.2-147.2-25.6-211.2 32-38.4 76.8-57.6 121.6-57.6h108.8L371.2 192C403.2 108.8 492.8 70.4 576 96c44.8 12.8 83.2 51.2 96 89.6l32 102.4h108.8c89.6 0 153.6 70.4 153.6 153.6 0 44.8-25.6 89.6-64 115.2l-89.6 64 32 102.4c25.6 76.8-19.2 166.4-102.4 185.6-44.8 12.8-96 6.4-134.4-19.2L524.8 832z" fill="#FF787F" p-id="5051"></path><path d="M518.4 531.2m-192 0a192 192 0 1 0 384 0 192 192 0 1 0-384 0Z" fill="#FFD566" p-id="5052"></path></svg>`;
+                flowerCountElement.appendChild(flower);
+            }
+        }
+
+        // 函数处理加减小红花数量
+        function adjustFlowers(childName, action) {
+            if (action === 'increase') {
+                flowers[childName]++;
+            } else if (action === 'decrease' && flowers[childName] > 0) {
+                flowers[childName]--;
+            }
+            sortChildren();  // 调用排序函数
+            renderChildren();  // 重新渲染排序后的孩子列表
+        }
+
+        // 排序函数：按小红花数量从高到低排序
+        function sortChildren() {
+            children.sort((a, b) => flowers[b] - flowers[a]);
+        }
+
+        // 渲染孩子的显示内容
+        function renderChildren() {
+            const childrenListElement = document.getElementById('children-list');
+            childrenListElement.innerHTML = '';  // 清空当前显示
+
+            children.forEach(child => {
+                const childContainer = document.createElement('div');
+                childContainer.className = 'child-container';
+
+                const nameAndButtonsContainer = document.createElement('div');
+                nameAndButtonsContainer.className = 'name-and-buttons';
+
+                const buttonsContainer = document.createElement('div');
+                buttonsContainer.className = 'buttons';
+
+                const increaseButton = document.createElement('button');
+                increaseButton.textContent = '+';
+                increaseButton.onclick = () => adjustFlowers(child, 'increase');
+
+                const decreaseButton = document.createElement('button');
+                decreaseButton.textContent = '-';
+                decreaseButton.onclick = () => adjustFlowers(child, 'decrease');
+
+                const childNameElement = document.createElement('span');
+                childNameElement.className = 'child-name';
+                childNameElement.textContent = child;
+
+                const flowerCountElement = document.createElement('span');
+                flowerCountElement.id = `flower-count-${child}`;
+                flowerCountElement.className = 'flower-count';
+
+                buttonsContainer.appendChild(increaseButton);
+                buttonsContainer.appendChild(decreaseButton);
+                nameAndButtonsContainer.appendChild(buttonsContainer);
+                nameAndButtonsContainer.appendChild(childNameElement);
+
+                childContainer.appendChild(nameAndButtonsContainer);
+                childContainer.appendChild(flowerCountElement);
+
+                childrenListElement.appendChild(childContainer);
+                updateFlowers(child);  // 更新显示的小红花
+            });
+        }
+
+        // 初始化所有孩子的小红花数量
+        renderChildren();
+    </script>
+</body>
+</html>

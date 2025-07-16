@@ -1,127 +1,155 @@
 <!DOCTYPE html>
 <html lang="zh">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>随机抽名字</title>
-  <style>
-    body {
-      margin: 0;
-      padding: 0;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: radial-gradient(circle at center, #c2e9fb, #a1c4fd);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      overflow: hidden;
-    }
-    .container {
-      background: white;
-      padding: 3rem;
-      border-radius: 30px;
-      box-shadow: 0 15px 40px rgba(0,0,0,0.2);
-      max-width: 600px;
-      width: 100%;
-      text-align: center;
-      animation: fadeIn 1s ease-in-out;
-    }
-    h1 {
-      font-size: 2.5rem;
-      margin-bottom: 2rem;
-      color: #2c3e50;
-    }
-    button {
-      padding: 0.8rem 1.5rem;
-      font-size: 1.2rem;
-      background: linear-gradient(135deg, #667eea, #764ba2);
-      color: white;
-      border: none;
-      border-radius: 10px;
-      cursor: pointer;
-      transition: transform 0.2s ease, background 0.3s ease;
-    }
-    button:hover:not(:disabled) {
-      background: linear-gradient(135deg, #5a67d8, #6b46c1);
-      transform: scale(1.05);
-    }
-    .result {
-      margin-top: 3rem;
-      font-size: 2.8rem;
-      color: #6b46c1;
-      font-weight: bold;
-      height: 3rem;
-      transition: transform 0.3s ease-in-out;
-    }
-    @keyframes flash {
-      0% { transform: scale(1); opacity: 1; }
-      50% { transform: scale(1.2); opacity: 0.6; }
-      100% { transform: scale(1); opacity: 1; }
-    }
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-  </style>
-</head>
-<body>
-  <div class="container">
-    <h1>🎉 随机抽名字</h1>
-    <button id="pickButton">开始抽取</button>
-    <div id="result" class="result"></div>
-  </div>
-
-  <script>
-    let names = [];
-    let intervalId = null;
-
-    // 自动加载名单
-    window.addEventListener('DOMContentLoaded', () => {
-      fetch('studentName.json')
-        .then(response => {
-          if (!response.ok) {
-            throw new Error('无法加载 studentName.json');
-          }
-          return response.json();
-        })
-        .then(data => {
-          if (Array.isArray(data)) {
-            names = data;
-            document.getElementById('pickButton').disabled = false;
-          } else {
-            alert("JSON格式错误，应为数组格式，如 [\"张三\", \"李四\"]");
-          }
-        })
-        .catch(error => {
-          alert("加载失败: " + error.message);
-        });
-    });
-
-    document.getElementById('pickButton').addEventListener('click', function () {
-      const resultEl = document.getElementById('result');
-      if (names.length === 0) return;
-
-      let duration = 2500;
-      let interval = 100;
-      let elapsed = 0;
-
-      clearInterval(intervalId);
-
-      intervalId = setInterval(() => {
-        const randomName = names[Math.floor(Math.random() * names.length)];
-        resultEl.textContent = randomName;
-        resultEl.style.animation = "flash 0.3s";
-        setTimeout(() => resultEl.style.animation = '', 300);
-        elapsed += interval;
-
-        if (elapsed >= duration) {
-          clearInterval(intervalId);
-          const finalName = names[Math.floor(Math.random() * names.length)];
-          resultEl.textContent = `🎯 抽中：${finalName}`;
-          resultEl.style.animation = "flash 0.6s 3";
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>随机抽名字</title>
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background: radial-gradient(circle at center, #c2e9fb, #a1c4fd);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        overflow: hidden;
+      }
+      .container {
+        background: white;
+        padding: 3rem;
+        border-radius: 30px;
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
+        max-width: 600px;
+        width: 100%;
+        text-align: center;
+        animation: fadeIn 1s ease-in-out;
+      }
+      h1 {
+        font-size: 2.5rem;
+        margin-bottom: 2rem;
+        color: #2c3e50;
+      }
+      button {
+        padding: 0.8rem 1.5rem;
+        font-size: 1.2rem;
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: white;
+        border: none;
+        border-radius: 10px;
+        cursor: pointer;
+        transition: transform 0.2s ease, background 0.3s ease;
+      }
+      button:hover:not(:disabled) {
+        background: linear-gradient(135deg, #5a67d8, #6b46c1);
+        transform: scale(1.05);
+      }
+      .result {
+        margin-top: 3rem;
+        font-size: 2.8rem;
+        color: #6b46c1;
+        font-weight: bold;
+        height: 3rem;
+        transition: transform 0.3s ease-in-out;
+      }
+      @keyframes flash {
+        0% {
+          transform: scale(1);
+          opacity: 1;
         }
-      }, interval);
-    });
-  </script>
-</body>
+        50% {
+          transform: scale(1.2);
+          opacity: 0.6;
+        }
+        100% {
+          transform: scale(1);
+          opacity: 1;
+        }
+      }
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>🎉 随机抽名字</h1>
+      <button id="pickButton">开始抽取</button>
+      <div id="result" class="result"></div>
+    </div>
+
+    <script>
+      let names = [];
+      let intervalId = null;
+
+      // 自动加载名单
+      window.addEventListener("DOMContentLoaded", () => {
+        fetch("studentName.json")
+          .then((response) => {
+            if (!response.ok) {
+              throw new Error("无法加载 studentName.json");
+            }
+            return response.json();
+          })
+          .then((data) => {
+            if (Array.isArray(data)) {
+              names = data;
+              document.getElementById("pickButton").disabled = false;
+            } else {
+              alert('JSON格式错误，应为数组格式，如 ["张三", "李四"]');
+            }
+          })
+          .catch((error) => {
+            alert("加载失败: " + error.message);
+          });
+      });
+
+      document
+        .getElementById("pickButton")
+        .addEventListener("click", function () {
+          const resultEl = document.getElementById("result");
+          if (names.length === 0) return;
+
+          let duration = 2500;
+          let interval = 100;
+          let elapsed = 0;
+
+          clearInterval(intervalId);
+
+          intervalId = setInterval(() => {
+            const randomName = names[Math.floor(Math.random() * names.length)];
+            resultEl.textContent = randomName;
+            resultEl.style.animation = "flash 0.3s";
+            setTimeout(() => (resultEl.style.animation = ""), 300);
+            elapsed += interval;
+
+            if (elapsed >= duration) {
+              clearInterval(intervalId);
+              const finalName = names[Math.floor(Math.random() * names.length)];
+              resultEl.textContent = `🎯 抽中：${finalName}`;
+              resultEl.style.animation = "flash 0.6s 3";
+            }
+          }, interval);
+        });
+    </script>
+    <script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://jk.lllt.top/api/leimu"></script>
+    <script
+      src="https://jk.lllt.top/api/xuehua"
+      rel="external nofollow"
+    ></script>
+    <script src="https://jk.lllt.top/api/sjcaidai"></script>
+    <script src="https://jk.lllt.top/api/hudongxingkong"></script>
+    
+    <!-- //定义雪花颜色 -->
+    <!-- <script>var sf = new Snowflakes({color: "pink"});</script> -->
+  </body>
 </html>

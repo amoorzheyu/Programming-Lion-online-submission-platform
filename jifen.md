@@ -1,0 +1,15 @@
+熙粤：596 Python C级
+元钦：366 C++ A级
+俊漩：266 Python A级
+铠磊：266 Python A级
+远涵：171 C++ A级
+铠烨：94 Python A级
+景珑：67 Python A级
+杨政：62 C++ A级
+锦峰：39 Python C级
+耀隆：27 Python A级
+希杰：23 Python A级
+睿谦：18 C++ A级
+梓睿：16 Python A级
+可馨：4 Python C级
+哲涵：7 Python C级

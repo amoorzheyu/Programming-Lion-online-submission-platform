@@ -71,19 +71,44 @@ const upload = multer({
 let contentStudentData = getContentStudentData();
 
 // 保存学生名单
-let saveStudentNameList = ()=>{
-  let  studentName = [];
+let saveStudentNameList = () => {
+  let studentName = [];
   for (let i = 0; i < Object.keys(contentStudentData).length; i++) {
     studentName.push(contentStudentData[i].name);
   }
 
   fs.writeFileSync("studentName.json", JSON.stringify(studentName));
-}
+};
 
- saveStudentNameList()
+saveStudentNameList();
 
 //保存老师的内容
 let contentTeacherData = { name: "老师", data: "" };
+
+// 获取 jifen.md 文件内容
+app.get("/api/jifen", (req, res) => {
+  const filePath = path.join(__dirname, "jifen.md");
+  fs.readFile(filePath, "utf8", (err, data) => {
+    if (err) {
+      return res.status(500).send("无法读取文件");
+    }
+    res.send(data);
+  });
+});
+
+// 更新 jifen.md 文件
+app.post("/api/update", (req, res) => {
+  const updatedData = req.body.data; // 获取更新的数据
+  const filePath = path.join(__dirname, "jifen.md");
+
+  // 将更新后的数据写入文件
+  fs.writeFile(filePath, updatedData, "utf8", (err) => {
+    if (err) {
+      return res.status(500).send("无法更新文件");
+    }
+    res.send("积分更新成功");
+  });
+});
 
 // 默认路由，访问根路径时返回 index.html
 app.get("/", (req, res) => {
