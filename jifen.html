@@ -1,214 +1,279 @@
 <!DOCTYPE html>
 <html lang="zh">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>积分管理系统</title>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>积分管理系统</title>
 
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" />
-  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-  <style>
-    body::-webkit-scrollbar { display: none; }
-    body {
-      font-family: Arial;
-      background: #f4f4f4;
-      padding: 20px;
-      background-image: url(./jifen_bg.png);
-      background-repeat: no-repeat;
-      background-size: cover;
-      background-position: center;
-      background-attachment: fixed;
-    }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 15px;
-    }
-    th, td {
-      border: 1px solid #999;
-      padding: 8px;
-      text-align: center;
-    }
-    th { background-color: #DCC8C1; }
-    .negative { background-color: #f8d7da !important; }
-    .gold { background-color: #ffd70055 !important; }
-    .silver { background-color: #c0c0c055 !important; }
-    .bronze { background-color: #cd7f3255 !important; }
-
-    .uibutton {
-      position: relative;
-      display: inline-flex;
-      justify-content: center;
-      align-items: center;
-      min-width: 80px;
-      min-height: 42px;
-      border: none;
-      background: transparent;
-      padding: 0;
-      cursor: pointer;
-      transition: filter 250ms;
-      overflow: visible;
-      user-select: none;
-      touch-action: manipulation;
-    }
-
-    .uibutton .shadow,
-    .uibutton .edge,
-    .uibutton .front {
-      border-radius: 12px;
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-    }
-
-    .uibutton .shadow {
-      background: hsl(0deg 0% 0% / 0.25);
-      transform: translateY(2px);
-      transition: transform 600ms cubic-bezier(0.3, 0.7, 0.4, 1);
-      z-index: 0;
-    }
-
-    .uibutton .edge {
-      background: linear-gradient(to left,
-        var(--edge-dark) 0%,
-        var(--edge-light) 8%,
-        var(--edge-light) 92%,
-        var(--edge-dark) 100%);
-      z-index: 1;
-    }
-
-    .uibutton .front {
-      display: block;
-      position: relative;
-      padding: 10px 20px;
-      font-size: 14px;
-      color: white;
-      background: var(--front);
-      transform: translateY(-4px);
-      transition: transform 600ms cubic-bezier(0.3, 0.7, 0.4, 1);
-      z-index: 2;
-    }
-
-    .uibutton:hover { filter: brightness(110%); }
-    .uibutton:hover .front {
-      transform: translateY(-6px);
-      transition: transform 250ms cubic-bezier(0.3, 0.7, 0.4, 1.5);
-    }
-    .uibutton:active .front {
-      transform: translateY(-2px);
-      transition: transform 34ms;
-    }
-    .uibutton:hover .shadow {
-      transform: translateY(4px);
-      transition: transform 250ms cubic-bezier(0.3, 0.7, 0.4, 1.5);
-    }
-    .uibutton:active .shadow {
-      transform: translateY(1px);
-      transition: transform 34ms;
-    }
-
-    .green {
-      --front: hsl(140, 80%, 40%);
-      --edge-light: hsl(140, 80%, 55%);
-      --edge-dark: hsl(140, 80%, 25%);
-    }
-    .red {
-      --front: hsl(0, 80%, 47%);
-      --edge-light: hsl(0, 80%, 60%);
-      --edge-dark: hsl(0, 80%, 30%);
-    }
-    .blue {
-      --front: hsl(220, 80%, 50%);
-      --edge-light: hsl(220, 80%, 65%);
-      --edge-dark: hsl(220, 80%, 30%);
-    }
-  </style>
-</head>
-<body>
-  <h1>积分管理系统</h1>
-
-  <div style="display: flex; gap: 14px; margin-bottom: 10px">
-    <div style="position: relative; display: inline-block">
-      <button class="uibutton blue" onclick="updateScores()">
-        <span class="shadow"></span>
-        <span class="edge"></span>
-        <span class="front text">更新积分</span>
-      </button>
-    </div>
-    <div style="position: relative; display: inline-block">
-      <button class="uibutton blue" onclick="rankByScore()">
-        <span class="shadow"></span>
-        <span class="edge"></span>
-        <span class="front text">按积分排名</span>
-      </button>
-    </div>
-  </div>
-
-  <table id="scores-table">
-    <thead>
-      <tr>
-        <th>排名</th>
-        <th>姓名</th>
-        <th>班级</th>
-        <th>等级</th>
-        <th>当前积分</th>
-        <th>操作</th>
-      </tr>
-    </thead>
-    <tbody></tbody>
-  </table>
-
-  <script>
-    let currentScores = [];
-    let activeInputIndex = null;
-
-    const Toast = Swal.mixin({
-      toast: true,
-      position: "top-end",
-      showConfirmButton: false,
-      timer: 1600,
-      timerProgressBar: true,
-    });
-
-    function parseScores(data) {
-      const lines = data.trim().split(/\r?\n/);
-      const scores = [];
-
-      for (let line of lines) {
-        line = line.replace(/\*\*/g, "").trim();
-        if (!line) continue;
-
-        const parts = line.split(/\s+/);
-        if (parts.length < 3) continue;
-
-        const [main, className, level] = parts;
-        const [name, scoreStr] = main.split("：");
-        const score = parseInt(scoreStr);
-
-        if (name && !isNaN(score)) {
-          scores.push({ name, score, className, level });
-        }
+    <style>
+      body::-webkit-scrollbar {
+        display: none;
+      }
+      body {
+        font-family: Arial;
+        background: #f4f4f4;
+        padding: 20px;
+        background-image: url(./jifen_bg.png);
+        background-repeat: no-repeat;
+        background-size: cover;
+        background-position: center;
+        background-attachment: fixed;
       }
 
-      return scores;
-    }
+      /* Carousel Styles */
+      #carousel-container {
+        position: absolute;
+        top: 10px;
+        right: 100px;
+        width: 150px;
+        height: 150px; /* Adjust the height of the carousel */
+        overflow: hidden;
+        z-index: 999;
+        /* background-color: rgba(0, 0, 0, 0.5);  */
+      }
 
-    function renderScores(scores) {
-      const tbody = document.querySelector("#scores-table tbody");
-      tbody.innerHTML = "";
-      currentScores = scores;
+      .carousel-slide {
+        display: none;
+        width: 100%;
+        height: 100%;
+        justify-content: center;
+        align-items: center;
+        position: absolute;
+      }
 
-      scores.forEach((entry, index) => {
-        const row = document.createElement("tr");
-        if (index === 0) row.classList.add("gold");
-        else if (index === 1) row.classList.add("silver");
-        else if (index === 2) row.classList.add("bronze");
-        if (entry.score < 0) row.classList.add("negative");
+      .carousel-img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover; /* Ensures images cover the area without distortion */
+      }
 
-        row.innerHTML = `
+      .carousel-slide.active {
+        display: block;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 15px;
+      }
+
+      th,
+      td {
+        border: 1px solid #999;
+        padding: 8px;
+        text-align: center;
+      }
+
+      th {
+        background-color: #dcc8c1;
+      }
+      .negative {
+        background-color: #f8d7da !important;
+      }
+      .gold {
+        background-color: #ffd70055 !important;
+      }
+      .silver {
+        background-color: #c0c0c055 !important;
+      }
+      .bronze {
+        background-color: #cd7f3255 !important;
+      }
+
+      .uibutton {
+        position: relative;
+        display: inline-flex;
+        justify-content: center;
+        align-items: center;
+        min-width: 80px;
+        min-height: 42px;
+        border: none;
+        background: transparent;
+        padding: 0;
+        cursor: pointer;
+        transition: filter 250ms;
+        overflow: visible;
+        user-select: none;
+        touch-action: manipulation;
+      }
+
+      .uibutton .shadow,
+      .uibutton .edge,
+      .uibutton .front {
+        border-radius: 12px;
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+      }
+
+      .uibutton .shadow {
+        background: hsl(0deg 0% 0% / 0.25);
+        transform: translateY(2px);
+        transition: transform 600ms cubic-bezier(0.3, 0.7, 0.4, 1);
+        z-index: 0;
+      }
+
+      .uibutton .edge {
+        background: linear-gradient(
+          to left,
+          var(--edge-dark) 0%,
+          var(--edge-light) 8%,
+          var(--edge-light) 92%,
+          var(--edge-dark) 100%
+        );
+        z-index: 1;
+      }
+
+      .uibutton .front {
+        display: block;
+        position: relative;
+        padding: 10px 20px;
+        font-size: 14px;
+        color: white;
+        background: var(--front);
+        transform: translateY(-4px);
+        transition: transform 600ms cubic-bezier(0.3, 0.7, 0.4, 1);
+        z-index: 2;
+      }
+
+      .uibutton:hover {
+        filter: brightness(110%);
+      }
+      .uibutton:hover .front {
+        transform: translateY(-6px);
+        transition: transform 250ms cubic-bezier(0.3, 0.7, 0.4, 1.5);
+      }
+      .uibutton:active .front {
+        transform: translateY(-2px);
+        transition: transform 34ms;
+      }
+      .uibutton:hover .shadow {
+        transform: translateY(4px);
+        transition: transform 250ms cubic-bezier(0.3, 0.7, 0.4, 1.5);
+      }
+      .uibutton:active .shadow {
+        transform: translateY(1px);
+        transition: transform 34ms;
+      }
+
+      .green {
+        --front: hsl(140, 80%, 40%);
+        --edge-light: hsl(140, 80%, 55%);
+        --edge-dark: hsl(140, 80%, 25%);
+      }
+      .red {
+        --front: hsl(0, 80%, 47%);
+        --edge-light: hsl(0, 80%, 60%);
+        --edge-dark: hsl(0, 80%, 30%);
+      }
+      .blue {
+        --front: hsl(220, 80%, 50%);
+        --edge-light: hsl(220, 80%, 65%);
+        --edge-dark: hsl(220, 80%, 30%);
+      }
+
+      .carousel-img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Carousel Section -->
+    <div id="carousel-container">
+      <!-- Placeholder for images, this will be populated by JavaScript -->
+    </div>
+
+    <h1>积分管理系统</h1>
+
+    <div style="display: flex; gap: 14px; margin-bottom: 10px">
+      <div style="position: relative; display: inline-block">
+        <button class="uibutton blue" onclick="updateScores()">
+          <span class="shadow"></span>
+          <span class="edge"></span>
+          <span class="front text">更新积分</span>
+        </button>
+      </div>
+      <div style="position: relative; display: inline-block">
+        <button class="uibutton blue" onclick="rankByScore()">
+          <span class="shadow"></span>
+          <span class="edge"></span>
+          <span class="front text">按积分排名</span>
+        </button>
+      </div>
+    </div>
+
+    <table id="scores-table">
+      <thead>
+        <tr>
+          <th>排名</th>
+          <th>姓名</th>
+          <th>班级</th>
+          <th>等级</th>
+          <th>当前积分</th>
+          <th>操作</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+
+    <script>
+      let currentScores = [];
+      let activeInputIndex = null;
+
+      const Toast = Swal.mixin({
+        toast: true,
+        position: "top-end",
+        showConfirmButton: false,
+        timer: 1600,
+        timerProgressBar: true,
+      });
+
+      function parseScores(data) {
+        const lines = data.trim().split(/\r?\n/);
+        const scores = [];
+
+        for (let line of lines) {
+          line = line.replace(/\*\*/g, "").trim();
+          if (!line) continue;
+
+          const parts = line.split(/\s+/);
+          if (parts.length < 3) continue;
+
+          const [main, className, level] = parts;
+          const [name, scoreStr] = main.split("：");
+          const score = parseInt(scoreStr);
+
+          if (name && !isNaN(score)) {
+            scores.push({ name, score, className, level });
+          }
+        }
+
+        return scores;
+      }
+
+      function renderScores(scores) {
+        const tbody = document.querySelector("#scores-table tbody");
+        tbody.innerHTML = "";
+        currentScores = scores;
+
+        scores.forEach((entry, index) => {
+          const row = document.createElement("tr");
+          if (index === 0) row.classList.add("gold");
+          else if (index === 1) row.classList.add("silver");
+          else if (index === 2) row.classList.add("bronze");
+          if (entry.score < 0) row.classList.add("negative");
+
+          row.innerHTML = `
           <td>${index + 1}</td>
           <td>${entry.name}</td>
           <td>${entry.className}</td>
@@ -225,93 +290,170 @@
             </div>
           </td>
         `;
-        tbody.appendChild(row);
-      });
-    }
+          tbody.appendChild(row);
+        });
+      }
 
-    function openInput(index, mode) {
-      if (activeInputIndex !== null) renderScores(currentScores);
-      const cell = document.getElementById(`action-${index}`);
-      cell.innerHTML = `
+      function openInput(index, mode) {
+        if (activeInputIndex !== null) renderScores(currentScores);
+        const cell = document.getElementById(`action-${index}`);
+        cell.innerHTML = ` 
         <div style="display: flex; align-items: center; gap: 10px; justify-content: center;">
           <input type="number" id="input-${index}" placeholder="分数" style="width:60px;" />
-          <button class="uibutton ${mode === "add" ? "green" : "red"}" onclick="submitChange(${index}, '${mode}')">
+          <button class="uibutton ${
+            mode === "add" ? "green" : "red"
+          }" onclick="submitChange(${index}, '${mode}')">
             <span class="shadow"></span>
             <span class="edge"></span>
             <span class="front text">确定</span>
           </button>
         </div>
       `;
-      const input = document.getElementById(`input-${index}`);
-      input.focus();
-      input.addEventListener("keydown", (e) => {
-        if (e.key === "Enter") submitChange(index, mode);
-      });
-      activeInputIndex = index;
-    }
-
-    function submitChange(index, mode) {
-      const input = document.getElementById(`input-${index}`);
-      const delta = parseInt(input.value);
-      if (isNaN(delta)) {
-        Toast.fire({ icon: "error", title: "请输入有效数字" });
-        return;
+        const input = document.getElementById(`input-${index}`);
+        input.focus();
+        input.addEventListener("keydown", (e) => {
+          if (e.key === "Enter") submitChange(index, mode);
+        });
+        activeInputIndex = index;
       }
-      const scores = [...currentScores];
-      if (mode === "add") scores[index].score += delta;
-      else scores[index].score -= delta;
 
-      const updatedText = scores
-        .map((item) => `${item.name}：${item.score} ${item.className} ${item.level}`)
-        .join("\n");
+      function submitChange(index, mode) {
+        const input = document.getElementById(`input-${index}`);
+        const delta = parseInt(input.value);
+        if (isNaN(delta)) {
+          Toast.fire({ icon: "error", title: "请输入有效数字" });
+          return;
+        }
+        const scores = [...currentScores];
+        if (mode === "add") scores[index].score += delta;
+        else scores[index].score -= delta;
 
-      fetch("http://localhost:80/api/update", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ data: updatedText }),
-      })
-        .then((res) => res.text())
-        .then(() => {
-          Toast.fire({ icon: "success", title: "积分更新成功" });
-          updateScores();
+        const updatedText = scores
+          .map(
+            (item) =>
+              `${item.name}：${item.score} ${item.className} ${item.level}`
+          )
+          .join("\n");
+
+        fetch("http://localhost:80/api/update", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ data: updatedText }),
         })
-        .catch((error) => {
-          console.error("更新失败:", error);
-          Toast.fire({ icon: "error", title: "更新失败，请稍后再试" });
-        });
-    }
+          .then((res) => res.text())
+          .then(() => {
+            Toast.fire({ icon: "success", title: "积分更新成功" });
+            updateScores();
+          })
+          .catch((error) => {
+            console.error("更新失败:", error);
+            Toast.fire({ icon: "error", title: "更新失败，请稍后再试" });
+          });
+      }
 
-    function updateScores(sortedScores = null) {
-      fetch("http://localhost:80/api/jifen")
-        .then((response) => response.text())
-        .then((data) => {
-          let scores = parseScores(data);
-          if (sortedScores) scores = sortedScores;
-          renderScores(scores);
-          activeInputIndex = null;
-        })
-        .catch((error) => {
-          console.error("获取积分失败:", error);
-          Toast.fire({ icon: "error", title: "加载失败，请检查后端" });
-        });
-    }
+      function updateScores(sortedScores = null) {
+        fetch("http://localhost:80/api/jifen")
+          .then((response) => response.text())
+          .then((data) => {
+            let scores = parseScores(data);
+            if (sortedScores) scores = sortedScores;
+            renderScores(scores);
+            activeInputIndex = null;
+          })
+          .catch((error) => {
+            console.error("获取积分失败:", error);
+            Toast.fire({ icon: "error", title: "加载失败，请检查后端" });
+          });
+      }
 
-    function rankByScore() {
-      fetch("http://localhost:80/api/jifen")
-        .then((response) => response.text())
-        .then((data) => {
-          const scores = parseScores(data);
-          scores.sort((a, b) => b.score - a.score);
-          renderScores(scores);
-          activeInputIndex = null;
-        })
-        .catch((error) => {
-          console.error("排序失败:", error);
-          Toast.fire({ icon: "error", title: "排序失败，请稍后再试" });
-        });
-    }
+      function rankByScore() {
+        fetch("http://localhost:80/api/jifen")
+          .then((response) => response.text())
+          .then((data) => {
+            const scores = parseScores(data);
+            scores.sort((a, b) => b.score - a.score);
+            renderScores(scores);
+            activeInputIndex = null;
+          })
+          .catch((error) => {
+            console.error("排序失败:", error);
+            Toast.fire({ icon: "error", title: "排序失败，请稍后再试" });
+          });
+      }
 
-    updateScores();
-  </script>
-</body>
+      // Carousel functionality
+      let currentSlide = 0;
+      const carouselContainer = document.getElementById("carousel-container");
+      const totalSlides = 13; // Control the total number of slides (images)
+
+      // Create slides dynamically
+      for (let i = 1; i <= totalSlides; i++) {
+        const slide = document.createElement("div");
+        slide.classList.add("carousel-slide");
+        const img = document.createElement("img");
+        img.src = `./assert/imgs/${i}.png`; // Using 1.png, 2.png, etc.
+        img.alt = `Slide ${i}`;
+        img.classList.add("carousel-img");
+        slide.appendChild(img);
+        carouselContainer.appendChild(slide);
+      }
+
+      const slides = document.querySelectorAll(".carousel-slide");
+
+      function changeSlide() {
+        slides.forEach((slide) => slide.classList.remove("active"));
+        slides[currentSlide].classList.add("active");
+        currentSlide = (currentSlide + 1) % slides.length;
+      }
+
+      function createImageGIFElement(
+        imgPath,
+        width,
+        height,
+        top,
+        right,
+        left,
+        bottom,
+        objectFit = "contain",
+      ) {
+        // 创建图片元素
+        const img = document.createElement("img");
+        img.src = "./assert/gif/"+ imgPath; // 设置图片路径
+        img.style.width = width + "px"; // 设置宽度
+        img.style.height = height + "px"; // 设置高度
+        img.style.objectFit = objectFit; // 设置 object-fit 属性
+        img.style.position = "absolute"; // 设置绝对定位
+        img.style.top = top + "px"; // 设置上边距
+        img.style.right = right + "px"; // 设置右边距
+        img.style.bottom = bottom + "px"; // 设置下边距
+        img.style.left = left + "px"; // 设置左边距
+
+        // 将图片元素添加到文档中
+        document.body.appendChild(img);
+      }
+
+      function creatALLGIF(){
+        createImageGIFElement("1.gif", 50, 50, 125, 300);
+        createImageGIFElement("5.gif", 200, 200, 56,600);
+        createImageGIFElement("7.gif", 70, 70, 100,0,-15);
+        createImageGIFElement("9.gif", 70, 70, 71,0,45);
+        createImageGIFElement("9.gif", 70, 70, 71,0,160);
+        createImageGIFElement("13.gif", 70, 70, 105,0,220);
+        createImageGIFElement("3.gif", 50, 50, 126,0,320);
+        createImageGIFElement("3.gif", 50, 50, 126,0,370);
+        createImageGIFElement("3.gif", 50, 50, 126,0,420);
+        createImageGIFElement("10.gif", 200, 200, 48,0,520);
+         createImageGIFElement("4.gif", 50, 50, 126,0,770);
+         createImageGIFElement("12.gif", 100, 100, -0,0,15);
+      }
+
+      setInterval(changeSlide, 5000); // Change slide every 10 seconds
+      changeSlide(); // Show the first slide immediately
+
+      updateScores();
+
+      creatALLGIF();
+
+    </script>
+  </body>
 </html>
