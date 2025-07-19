@@ -1,9 +1,8 @@
 let contentStudentData = {
   //  0: {name:'xxx',data:'',isReset:true},
 
-
   // -----------周一----------晚上正常名单----------------------------
-  
+
   // 0:{name:'黄熙粤',data:'',isReset:true},
   // 1:{name:'胡哲涵',data:'',isReset:true},
 
@@ -51,13 +50,13 @@ let contentStudentData = {
 
   // 0:{name:"xxx",data:"",isReset:true}
 
-    // -----------第一期暑假班-----------下午第一节课正常名单----------------------------
-  0: { name: '罗耀隆', data: '' ,isReset:true},
-  1: { name: "姜希杰", data: "", isReset: true },
-  2: { name: "邓景珑", data: "", isReset: true },
-  3: { name: '林俊漩', data: '' ,isReset:true},
-  4: { name: '谢铠烨', data: '' ,isReset:true},
-  5: { name: '谢铠磊', data: '' ,isReset:true},
+  // -----------第一期暑假班-----------下午第一节课正常名单----------------------------
+  0: { name: "罗耀隆", data: "", isReset: true },
+  1: { name: "谢铠烨", data: "", isReset: true },
+  2: { name: "谢铠磊", data: "", isReset: true },
+  3: { name: "姜希杰", data: "", isReset: true },
+  4: { name: "邓景珑", data: "", isReset: true },
+  5: { name: "林俊漩", data: "", isReset: true },
 };
 
 let getContentStudentData = () => {

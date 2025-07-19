@@ -185,6 +185,38 @@
         height: 100%;
         object-fit: contain;
       }
+
+      @font-face {
+        font-family: "CustomFont_0"; /* 自定义字体名称 */
+        src: url("./assert/ttf/狮子座体.ttf") format("truetype");
+        font-weight: normal;
+        font-style: normal;
+      }
+
+      @font-face {
+        font-family: "CustomFont_2"; /* 自定义字体名称 */
+        src: url("./assert/ttf/鸿雷板书简体.ttf") format("truetype");
+        font-weight: normal;
+        font-style: normal;
+      }
+      * {
+        /* font-family: "CustomFont_2", sans-serif;*/
+        font-size: 18px; 
+      }
+
+      @font-face {
+        font-family: "CustomFont_1"; /* 自定义字体名称 */
+        src: url("./assert/ttf/aa鹅卵石.ttf") format("truetype");
+        font-weight: normal;
+        font-style: normal;
+      }
+      h1 {
+        font-family: "CustomFont_1", sans-serif; /* 优先使用自定义字体，无法加载时使用后备字体 */
+        font-size: 36px;
+      }
+      img {
+        z-index: -999;
+      }
     </style>
   </head>
   <body>
@@ -384,7 +416,7 @@
       // Carousel functionality
       let currentSlide = 0;
       const carouselContainer = document.getElementById("carousel-container");
-      const totalSlides = 4; // Control the total number of slides (images)
+      const totalSlides = 6; // Control the total number of slides (images)
 
       // Create slides dynamically
       for (let i = 1; i <= totalSlides; i++) {
@@ -414,11 +446,11 @@
         right,
         left,
         bottom,
-        objectFit = "contain",
+        objectFit = "contain"
       ) {
         // 创建图片元素
         const img = document.createElement("img");
-        img.src = "./assert/gif/"+ imgPath; // 设置图片路径
+        img.src = "./assert/gif/" + imgPath; // 设置图片路径
         img.style.width = width + "px"; // 设置宽度
         img.style.height = height + "px"; // 设置高度
         img.style.objectFit = objectFit; // 设置 object-fit 属性
@@ -432,19 +464,19 @@
         document.body.appendChild(img);
       }
 
-      function creatALLGIF(){
+      function creatALLGIF() {
         createImageGIFElement("1.gif", 50, 50, 125, 300);
-        createImageGIFElement("5.gif", 200, 200, 56,600);
-        createImageGIFElement("7.gif", 70, 70, 100,0,-15);
-        createImageGIFElement("9.gif", 70, 70, 71,0,45);
-        createImageGIFElement("9.gif", 70, 70, 71,0,160);
-        createImageGIFElement("13.gif", 70, 70, 105,0,220);
-        createImageGIFElement("3.gif", 50, 50, 126,0,320);
-        createImageGIFElement("3.gif", 50, 50, 126,0,370);
-        createImageGIFElement("3.gif", 50, 50, 126,0,420);
-        createImageGIFElement("10.gif", 200, 200, 48,0,520);
-         createImageGIFElement("4.gif", 50, 50, 126,0,770);
-         createImageGIFElement("12.gif", 100, 100, -0,0,15);
+        createImageGIFElement("5.gif", 200, 200, 56, 600);
+        createImageGIFElement("7.gif", 70, 70, 100, 0, -15);
+        createImageGIFElement("9.gif", 70, 70, 71, 0, 45);
+        createImageGIFElement("9.gif", 70, 70, 71, 0, 160);
+        createImageGIFElement("13.gif", 70, 70, 105, 0, 220);
+        createImageGIFElement("3.gif", 50, 50, 126, 0, 320);
+        createImageGIFElement("3.gif", 50, 50, 126, 0, 370);
+        createImageGIFElement("3.gif", 50, 50, 126, 0, 420);
+        createImageGIFElement("10.gif", 200, 200, 48, 0, 520);
+        createImageGIFElement("4.gif", 50, 50, 126, 0, 770);
+        createImageGIFElement("12.gif", 100, 100, -0, 0, 15);
       }
 
       setInterval(changeSlide, 5000); // Change slide every 10 seconds
@@ -453,7 +485,6 @@
       updateScores();
 
       creatALLGIF();
-
     </script>
   </body>
 </html>
