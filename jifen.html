@@ -384,14 +384,14 @@
       // Carousel functionality
       let currentSlide = 0;
       const carouselContainer = document.getElementById("carousel-container");
-      const totalSlides = 6; // Control the total number of slides (images)
+      const totalSlides = 4; // Control the total number of slides (images)
 
       // Create slides dynamically
       for (let i = 1; i <= totalSlides; i++) {
         const slide = document.createElement("div");
         slide.classList.add("carousel-slide");
         const img = document.createElement("img");
-        img.src = `./assert/imgs/1-${i}.png`; // Using 1.png, 2.png, etc.
+        img.src = `./assert/imgs/2-${i}.png`; // Using 1.png, 2.png, etc.
         img.alt = `Slide ${i}`;
         img.classList.add("carousel-img");
         slide.appendChild(img);

@@ -2,10 +2,10 @@
 元钦：376 C++ A级
 铠磊：287 Python A级
 俊漩：277 Python A级
-远涵：161 C++ A级
+远涵：151 C++ A级
 雄晖：78 C++ S级
 铠烨：76 Python A级
-杨政：54 C++ A级
+杨政：14 C++ A级
 锦峰：44 Python C级
 景珑：21 Python A级
 梓悦：20 C++ S级
